@@ -53,11 +53,11 @@ where
     let phrase = phrase.as_ref().to_lowercase();
     let mut output = format!("Spelling of {phrase}\n\n");
     let mut iter = phrase.graphemes(true);
-    loop {
+    'outer: loop {
         if let (0, _) = iter.size_hint() {
             break;
         }
-        'inner: for size in [3, 2, 1] {
+        for size in [3, 2, 1] {
             if let Some((letter, w)) = iter.as_str().get(0..size).and_then(|letter| {
                 MAPPING
                     .get(letter)
@@ -70,7 +70,10 @@ where
                 for _ in 0..letter.chars().count() {
                     iter.next();
                 }
-                break 'inner;
+                continue 'outer;
+            }
+            if size == 1 {
+                iter.next();
             }
         }
     }
